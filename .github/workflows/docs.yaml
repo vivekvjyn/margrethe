@@ -13,11 +13,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -27,13 +25,14 @@ jobs:
           pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints sphinx-autosummary
           pip install -r requirements.txt || true
 
-      - name: Build HTML documentation
+      - name: Sphinx build
         run: |
-          cd docs
-          make html
+          sphinx-build docs _build
 
-      - name: Upload documentation artifact
-        uses: actions/upload-artifact@v3
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          name: sphinx-docs
-          path: docs/build/html
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: _build/
+          force_orphan: true
